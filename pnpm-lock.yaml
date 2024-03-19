@@ -1,0 +1,16 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+devDependencies:
+  '@studion/prettier-config':
+    specifier: ^0.1.0
+    version: 0.1.0
+
+packages:
+
+  /@studion/prettier-config@0.1.0:
+    resolution: {integrity: sha512-vt2pDuxO6wE5yL42PDVbMvYgFjGw1UXL21F6s9pSRtjALA7++v/Ie5+RdZh92xyf1+J1Ooe3Qn63A27MlpcfrQ==}
+    dev: true
