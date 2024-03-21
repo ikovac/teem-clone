@@ -15,7 +15,7 @@ export class CreateIdentityHandler {
   @OnEvent(Topic.USER_CREATED, { async: true })
   async handle(payload: UserCreated) {
     this.logger.info({ payload }, 'Executing CreateIdentityHandler');
-    const { email, role } = payload;
-    await this.identityService.createIdentity({ email, role });
+    const { email, role, uuid } = payload;
+    await this.identityService.createIdentity({ email, role, uuid });
   }
 }

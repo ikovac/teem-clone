@@ -18,6 +18,10 @@ export class Identity extends AggregateRoot {
   @Property()
   readonly uuid: string;
 
+  @Unique()
+  @Property()
+  readonly identityProviderId: string;
+
   @Enum(() => Role)
   readonly role: Role;
 }

@@ -11,18 +11,44 @@ export class IdentityService {
     private identityProvider: IdentityProviderService,
   ) {}
 
-  async createIdentity({ email, role }: { email: string; role: string }) {
-    return this.identityProvider.createIdentity({ email, role });
+  async createIdentity({
+    email,
+    role,
+    uuid,
+  }: {
+    email: string;
+    role: string;
+    uuid: string;
+  }) {
+    const identityCreateResult = await this.identityProvider.createIdentity({
+      email,
+      role,
+    });
+
+    this.setIdentityProviderId(uuid, identityCreateResult.id);
+
+    return identityCreateResult;
   }
 
-  async getByEmail(email: string): Promise<Identity> {
+  async getByIdentityProviderId(identityProviderId: string): Promise<Identity> {
     const identity = await this.em
       .createQueryBuilder(Identity)
       .select(['id'])
-      .where({ email })
+      .where({ identityProviderId })
       .limit(1)
       .getSingleResult();
     if (!identity) throw new EntityNotFoundException('Identity');
     return identity;
+  }
+
+  private async setIdentityProviderId(
+    uuid: string,
+    identityProviderId: string,
+  ) {
+    return this.em
+      .createQueryBuilder(Identity)
+      .update({ identityProviderId })
+      .where({ uuid })
+      .execute();
   }
 }

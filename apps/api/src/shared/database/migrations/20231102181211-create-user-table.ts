@@ -11,6 +11,7 @@ export class CreateUserTable extends Migration {
       .createTable(TABLE_NAME, (table) => {
         table.increments('id').primary();
         table.string('uuid').notNullable().unique();
+        table.string('identity_provider_id').unique();
         table.specificType('email', 'CITEXT').notNullable().unique();
         table.enum('role', roles);
         table.string('first_name').notNullable();

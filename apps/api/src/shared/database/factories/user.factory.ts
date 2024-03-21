@@ -3,6 +3,7 @@ import type { EntityManager } from '@mikro-orm/postgresql';
 
 type UserData = {
   uuid?: string;
+  identityProviderId?: string;
   email?: string;
   role?: 'admin' | 'user';
   firstName?: string;
@@ -16,6 +17,7 @@ export async function createUser(
   const knex = em.getKnex();
   const {
     uuid = faker.string.uuid(),
+    identityProviderId = null,
     email = faker.internet.email({ provider: 'example.org' }),
     role = 'user',
     firstName = faker.person.firstName(),
@@ -24,6 +26,7 @@ export async function createUser(
   const [{ id }] = await knex('user')
     .insert({
       uuid,
+      identity_provider_id: identityProviderId,
       email,
       role,
       first_name: firstName,

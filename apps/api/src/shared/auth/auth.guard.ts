@@ -49,10 +49,10 @@ export class AuthGuard implements CanActivate {
   }
 
   private async assignIdentityIdToRequest(request: Request): Promise<void> {
-    const email = request.auth?.payload['custom_email_claim'] as string;
-    if (!email) throw new UnauthorizedException();
+    const sub = request.auth?.payload.sub as string;
+    if (!sub) throw new UnauthorizedException();
     try {
-      const identity = await this.identityService.getByEmail(email);
+      const identity = await this.identityService.getByIdentityProviderId(sub);
       request.userId = identity.id;
     } catch (error) {
       if (error instanceof EntityNotFoundException) {
