@@ -49,7 +49,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private async assignIdentityIdToRequest(request: Request): Promise<void> {
-    const sub = request.auth?.payload.sub as string;
+    const sub = request.auth?.payload.sub;
     if (!sub) throw new UnauthorizedException();
     try {
       const identity = await this.identityService.getByIdentityProviderId(sub);
