@@ -20,8 +20,12 @@ export class Identity extends AggregateRoot {
 
   @Unique()
   @Property()
-  readonly identityProviderId: string;
+  identityProviderId: string;
 
   @Enum(() => Role)
   readonly role: Role;
+
+  update(identityProviderId: string) {
+    this.identityProviderId = identityProviderId;
+  }
 }

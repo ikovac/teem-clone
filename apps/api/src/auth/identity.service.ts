@@ -25,7 +25,9 @@ export class IdentityService {
       role,
     });
 
-    this.setIdentityProviderId(uuid, identityCreateResult.id);
+    const identity = await this.getByUuid(uuid);
+    identity.update(identityCreateResult.id);
+    await this.em.flush();
 
     return identityCreateResult;
   }
@@ -41,14 +43,14 @@ export class IdentityService {
     return identity;
   }
 
-  private async setIdentityProviderId(
-    uuid: string,
-    identityProviderId: string,
-  ) {
-    return this.em
+  private async getByUuid(uuid: string): Promise<Identity> {
+    const identity = await this.em
       .createQueryBuilder(Identity)
-      .update({ identityProviderId })
+      .select(['id'])
       .where({ uuid })
-      .execute();
+      .limit(1)
+      .getSingleResult();
+    if (!identity) throw new EntityNotFoundException('Identity');
+    return identity;
   }
 }
