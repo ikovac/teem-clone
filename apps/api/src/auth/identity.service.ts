@@ -1,14 +1,17 @@
-import { EntityManager } from '@mikro-orm/postgresql';
+import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { Identity } from './identity.entity';
 import { EntityNotFoundException } from 'shared/exceptions/entity-not-found.exception';
 import { IdentityProviderService } from './identity-provider.service';
+import { InjectRepository } from '@mikro-orm/nestjs';
 
 @Injectable()
 export class IdentityService {
   constructor(
     private em: EntityManager,
     private identityProvider: IdentityProviderService,
+    @InjectRepository(Identity)
+    private identityRepository: EntityRepository<Identity>,
   ) {}
 
   async createIdentity({
@@ -52,12 +55,7 @@ export class IdentityService {
   }
 
   private async getByUuid(uuid: string): Promise<Identity> {
-    const identity = await this.em
-      .createQueryBuilder(Identity)
-      .select(['id'])
-      .where({ uuid })
-      .limit(1)
-      .getSingleResult();
+    const identity = await this.identityRepository.findOne({ uuid });
     if (!identity) throw new EntityNotFoundException('Identity');
     return identity;
   }
