@@ -29,7 +29,13 @@ export class IdentityService {
 
     const identity = await this.getByUuid(uuid);
     identity.linkToIdentity(identityProviderIdentity.id);
-    await this.em.flush();
+
+    try {
+      await this.em.flush();
+    } catch (er) {
+      this.identityProvider.deleteIdentity(identityProviderIdentity.id);
+      throw er;
+    }
 
     return identityProviderIdentity;
   }
