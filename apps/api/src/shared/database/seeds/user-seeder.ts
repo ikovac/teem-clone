@@ -8,7 +8,7 @@ import {
 } from '../factories/identity-provider.factory';
 
 const SEED_EMAIL_DOMAIN = 'example.org';
-const SEED_PASSWORD = process.env.DB_SEED_USER_PASSWORD;
+const SEED_PASSWORD = process.env.DB_SEED_USER_PASSWORD || '';
 
 export class UserSeeder extends Seeder {
   async run(em: EntityManager, context: Dictionary): Promise<void> {
