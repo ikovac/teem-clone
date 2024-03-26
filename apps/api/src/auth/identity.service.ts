@@ -30,10 +30,11 @@ export class IdentityService {
       },
     );
 
-    const identity = await this.getByUuid(uuid);
-    identity.linkToIdentity(identityProviderIdentity.id);
-
     try {
+      const identity = await this.identityRepository.findOne({ uuid });
+      if (!identity) throw new EntityNotFoundException('Identity');
+
+      identity.linkToIdentity(identityProviderIdentity.id);
       await this.em.flush();
     } catch (er) {
       this.identityProvider.deleteIdentity(identityProviderIdentity.id);
@@ -50,12 +51,6 @@ export class IdentityService {
       .where({ identityProviderId })
       .limit(1)
       .getSingleResult();
-    if (!identity) throw new EntityNotFoundException('Identity');
-    return identity;
-  }
-
-  private async getByUuid(uuid: string): Promise<Identity> {
-    const identity = await this.identityRepository.findOne({ uuid });
     if (!identity) throw new EntityNotFoundException('Identity');
     return identity;
   }
