@@ -20,16 +20,18 @@ export class IdentityService {
     role: string;
     uuid: string;
   }) {
-    const identityCreateResult = await this.identityProvider.createIdentity({
-      email,
-      role,
-    });
+    const identityProviderIdentity = await this.identityProvider.createIdentity(
+      {
+        email,
+        role,
+      },
+    );
 
     const identity = await this.getByUuid(uuid);
-    identity.update(identityCreateResult.id);
+    identity.linkToIdentity(identityProviderIdentity.id);
     await this.em.flush();
 
-    return identityCreateResult;
+    return identityProviderIdentity;
   }
 
   async getByIdentityProviderId(identityProviderId: string): Promise<Identity> {

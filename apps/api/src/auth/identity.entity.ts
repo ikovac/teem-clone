@@ -25,7 +25,7 @@ export class Identity extends AggregateRoot {
   @Enum(() => Role)
   readonly role: Role;
 
-  update(identityProviderId: string) {
+  linkToIdentity(identityProviderId: string) {
     this.identityProviderId = identityProviderId;
   }
 }
