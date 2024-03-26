@@ -1,18 +1,27 @@
 import type { Dictionary, EntityManager } from '@mikro-orm/postgresql';
 import { Seeder } from '@mikro-orm/seeder';
 import { createUser } from '../factories/user.factory';
-import {
-  getAll,
-  create,
-  IdentityProviderUser,
-} from '../factories/identity-provider.factory';
+import { ManagementClient } from 'auth0';
+import authConfig from 'config/auth.config';
+
+const { domain, managementApiIdentifier, clientId, clientSecret } =
+  authConfig();
+const managementClient = new ManagementClient({
+  domain,
+  clientId,
+  clientSecret,
+  audience: managementApiIdentifier,
+});
 
 const SEED_EMAIL_DOMAIN = 'example.org';
-const SEED_PASSWORD = process.env.DB_SEED_USER_PASSWORD || '';
 
 export class UserSeeder extends Seeder {
   async run(em: EntityManager, context: Dictionary): Promise<void> {
-    const identityProviderUsers = await getAll(`email:*${SEED_EMAIL_DOMAIN}`);
+    const getUsersResponse = await managementClient.users.getAll({
+      q: `email:*${SEED_EMAIL_DOMAIN}`,
+      fields: 'user_id,email',
+    });
+    const identityProviderUsers = getUsersResponse.data;
 
     const adminEmail = `admin@${SEED_EMAIL_DOMAIN}`;
     const pAdmin = createUser(em, {
@@ -48,12 +57,11 @@ export class UserSeeder extends Seeder {
 
   private async getIdentityProviderId(
     email: string,
-    identityProviderUsers: IdentityProviderUser[],
+    identityProviderUsers: {
+      user_id: string;
+      email: string;
+    }[],
   ) {
-    const existingUserId = identityProviderUsers.find(
-      (user) => user.email === email,
-    )?.user_id;
-
-    return existingUserId ?? (await create(email, SEED_PASSWORD));
+    return identityProviderUsers.find((user) => user.email === email)?.user_id;
   }
 }
