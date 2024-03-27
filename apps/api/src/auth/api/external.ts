@@ -6,8 +6,12 @@ import { pick } from 'radash';
 export class IdentityExternalService {
   constructor(private identityService: IdentityService) {}
 
-  async getByEmail(email: string): Promise<{ id: number }> {
-    const identity = await this.identityService.getByEmail(email);
+  async getByIdentityProviderId(
+    identityProviderId: string,
+  ): Promise<{ id: number }> {
+    const identity = await this.identityService.getByIdentityProviderId(
+      identityProviderId,
+    );
     return pick(identity, ['id']);
   }
 }

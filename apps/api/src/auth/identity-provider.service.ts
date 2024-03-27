@@ -63,6 +63,10 @@ export class IdentityProviderService {
     };
   }
 
+  async deleteIdentity(id: string) {
+    return this.managementClient.users.delete({ id });
+  }
+
   async getRoles() {
     const roles = await this.managementClient.roles.getAll();
     return roles.data.map((it) => ({ id: it.id, name: it.name }));

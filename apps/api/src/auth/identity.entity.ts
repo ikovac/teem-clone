@@ -18,6 +18,14 @@ export class Identity extends AggregateRoot {
   @Property()
   readonly uuid: string;
 
+  @Unique()
+  @Property()
+  identityProviderId: string;
+
   @Enum(() => Role)
   readonly role: Role;
+
+  linkToIdentityProviderIdentity(identityProviderId: string) {
+    this.identityProviderId = identityProviderId;
+  }
 }
