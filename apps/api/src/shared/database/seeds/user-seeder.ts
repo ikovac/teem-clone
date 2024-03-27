@@ -16,20 +16,20 @@ const managementClient = new ManagementClient({
 const SEED_EMAIL_DOMAIN = 'example.org';
 
 export class UserSeeder extends Seeder {
+  identityProviderUsers: { user_id: string; email: string }[];
+
   async run(em: EntityManager, context: Dictionary): Promise<void> {
-    const getUsersResponse = await managementClient.users.getAll({
-      q: `email:*${SEED_EMAIL_DOMAIN}`,
-      fields: 'user_id,email',
-    });
-    const identityProviderUsers = getUsersResponse.data;
+    this.identityProviderUsers = (
+      await managementClient.users.getAll({
+        q: `email:*${SEED_EMAIL_DOMAIN}`,
+        fields: 'user_id,email',
+      })
+    ).data;
 
     const adminEmail = `admin@${SEED_EMAIL_DOMAIN}`;
     const pAdmin = createUser(em, {
       email: adminEmail,
-      identityProviderId: await this.getIdentityProviderId(
-        adminEmail,
-        identityProviderUsers,
-      ),
+      identityProviderId: this.getIdentityProviderId(adminEmail),
       role: 'admin',
     });
 
@@ -39,10 +39,7 @@ export class UserSeeder extends Seeder {
           ? `user${index}@${SEED_EMAIL_DOMAIN}`
           : `user@${SEED_EMAIL_DOMAIN}`;
 
-      const identityProviderId = await this.getIdentityProviderId(
-        email,
-        identityProviderUsers,
-      );
+      const identityProviderId = this.getIdentityProviderId(email);
 
       return createUser(em, {
         email,
@@ -55,13 +52,8 @@ export class UserSeeder extends Seeder {
     context.userIds = users;
   }
 
-  private async getIdentityProviderId(
-    email: string,
-    identityProviderUsers: {
-      user_id: string;
-      email: string;
-    }[],
-  ) {
-    return identityProviderUsers.find((user) => user.email === email)?.user_id;
+  private getIdentityProviderId(email: string) {
+    return this.identityProviderUsers.find((user) => user.email === email)
+      ?.user_id;
   }
 }
