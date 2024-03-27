@@ -10,9 +10,10 @@ import { InventoryController } from './api/http/inventory.controller';
 import { Location } from './core/entities/location.entity';
 import { InventoryItem } from './core/entities/inventory-item.entity';
 import { InventoryService } from './application/inventory.service';
+import { GetInventoryItemsHandler } from './application/queries/get-inventory-items.query';
 
 const commands = [CreateReservationHandler];
-const queries = [GetUserReservationsHandler];
+const queries = [GetUserReservationsHandler, GetInventoryItemsHandler];
 const eventHandlers = [SendReservationCreatedIntegrationEventHandler];
 
 @Module({

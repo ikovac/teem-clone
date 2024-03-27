@@ -18,13 +18,18 @@ import { Request } from 'express';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'shared/auth/permission.decorator';
 import { AuthGuard } from 'shared/auth/auth.guard';
+import { GetInventoryItemsQuery } from 'reservation/application/queries/get-inventory-items.query';
+import { QueryBus } from '@nestjs/cqrs';
 
 // TODO: Add DTOs for the request and response payloads
 @Controller('inventory-items')
 @ApiTags('inventory-items')
 @ApiBearerAuth('access-token')
 export class InventoryController {
-  constructor(private inventoryService: InventoryService) {}
+  constructor(
+    private inventoryService: InventoryService,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post()
   @UseGuards(WebhookSignatureGuard)
@@ -71,10 +76,12 @@ export class InventoryController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
-    return this.inventoryService.getAll({
-      pagination: req.pagination,
-      startDate: startDate && new Date(startDate),
-      endDate: endDate && new Date(endDate),
-    });
+    return this.queryBus.execute(
+      new GetInventoryItemsQuery(
+        req.pagination,
+        startDate && new Date(startDate),
+        endDate && new Date(endDate),
+      ),
+    );
   }
 }
