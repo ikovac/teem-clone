@@ -8,8 +8,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { WebhookSignatureGuard } from './webhook-signature.guard';
-import { InventoryService } from './inventory.service';
+import { WebhookSignatureGuard } from '../guards/webhook-signature.guard';
+import { InventoryService } from '../../application/inventory.service';
 import {
   PaginationInterceptor,
   PaginationQuery,

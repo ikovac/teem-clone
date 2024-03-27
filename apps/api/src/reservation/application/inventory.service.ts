@@ -1,8 +1,8 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import { Location } from './location.entity';
+import { Location } from '../core/entities/location.entity';
 import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
-import { InventoryItem } from './inventory-item.entity';
+import { InventoryItem } from '../core/entities/inventory-item.entity';
 import { EntityNotFoundException } from 'shared/exceptions/entity-not-found.exception';
 
 @Injectable()

@@ -6,14 +6,25 @@ import { ReservationController } from './api/http/reservation.controller';
 import { CreateReservationHandler } from './application/commands/create-reservation.command';
 import { SendReservationCreatedIntegrationEventHandler } from './application/event-handlers/send-reservation-created-integration-event.handler';
 import { GetUserReservationsHandler } from './application/queries/get-user-reservations.query';
+import { InventoryController } from './api/http/inventory.controller';
+import { Location } from './core/entities/location.entity';
+import { InventoryItem } from './core/entities/inventory-item.entity';
+import { InventoryService } from './application/inventory.service';
 
 const commands = [CreateReservationHandler];
 const queries = [GetUserReservationsHandler];
 const eventHandlers = [SendReservationCreatedIntegrationEventHandler];
 
 @Module({
-  imports: [MikroOrmModule.forFeature([ReservationItem, Reservation])],
-  controllers: [ReservationController],
-  providers: [...commands, ...queries, ...eventHandlers],
+  imports: [
+    MikroOrmModule.forFeature([
+      ReservationItem,
+      Reservation,
+      Location,
+      InventoryItem,
+    ]),
+  ],
+  controllers: [ReservationController, InventoryController],
+  providers: [...commands, ...queries, ...eventHandlers, InventoryService],
 })
 export class ReservationModule {}
