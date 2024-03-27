@@ -34,11 +34,11 @@ export class IdentityService {
       const identity = await this.identityRepository.findOne({ uuid });
       if (!identity) throw new EntityNotFoundException('Identity');
 
-      identity.linkToIdentity(identityProviderIdentity.id);
+      identity.linkToIdentityProviderIdentity(identityProviderIdentity.id);
       await this.em.flush();
-    } catch (er) {
+    } catch (err) {
       this.identityProvider.deleteIdentity(identityProviderIdentity.id);
-      throw er;
+      throw err;
     }
 
     return identityProviderIdentity;

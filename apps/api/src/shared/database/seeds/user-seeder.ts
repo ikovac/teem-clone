@@ -29,7 +29,7 @@ export class UserSeeder extends Seeder {
     const adminEmail = `admin@${SEED_EMAIL_DOMAIN}`;
     const pAdmin = createUser(em, {
       email: adminEmail,
-      identityProviderId: this.getIdentityProviderId(adminEmail),
+      identityProviderId: this.getIdentityProviderIdByEmail(adminEmail),
       role: 'admin',
     });
 
@@ -39,7 +39,7 @@ export class UserSeeder extends Seeder {
           ? `user${index}@${SEED_EMAIL_DOMAIN}`
           : `user@${SEED_EMAIL_DOMAIN}`;
 
-      const identityProviderId = this.getIdentityProviderId(email);
+      const identityProviderId = this.getIdentityProviderIdByEmail(email);
 
       return createUser(em, {
         email,
@@ -52,7 +52,7 @@ export class UserSeeder extends Seeder {
     context.userIds = users;
   }
 
-  private getIdentityProviderId(email: string) {
+  private getIdentityProviderIdByEmail(email: string) {
     return this.identityProviderUsers.find((user) => user.email === email)
       ?.user_id;
   }
