@@ -23,6 +23,11 @@ export class IdentityService {
     role: string;
     uuid: string;
   }) {
+    const identity = await this.identityRepository.findOne({ uuid });
+    if (!identity) throw new EntityNotFoundException('Identity');
+
+    if (identity.identityProviderId) return;
+
     const identityProviderIdentity = await this.identityProvider.createIdentity(
       {
         email,
@@ -31,9 +36,6 @@ export class IdentityService {
     );
 
     try {
-      const identity = await this.identityRepository.findOne({ uuid });
-      if (!identity) throw new EntityNotFoundException('Identity');
-
       identity.linkToIdentityProviderIdentity(identityProviderIdentity.id);
       await this.em.flush();
     } catch (err) {
