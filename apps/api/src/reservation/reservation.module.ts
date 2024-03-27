@@ -9,7 +9,6 @@ import { GetUserReservationsHandler } from './application/queries/get-user-reser
 import { InventoryController } from './api/http/inventory.controller';
 import { Location } from './core/entities/location.entity';
 import { InventoryItem } from './core/entities/inventory-item.entity';
-import { InventoryService } from './application/inventory.service';
 import { GetInventoryItemsHandler } from './application/queries/get-inventory-items.query';
 
 const commands = [CreateReservationHandler];
@@ -26,6 +25,6 @@ const eventHandlers = [SendReservationCreatedIntegrationEventHandler];
     ]),
   ],
   controllers: [ReservationController, InventoryController],
-  providers: [...commands, ...queries, ...eventHandlers, InventoryService],
+  providers: [...commands, ...queries, ...eventHandlers],
 })
 export class ReservationModule {}

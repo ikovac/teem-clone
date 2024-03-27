@@ -9,7 +9,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { WebhookSignatureGuard } from '../guards/webhook-signature.guard';
-import { InventoryService } from '../../application/inventory.service';
 import {
   PaginationInterceptor,
   PaginationQuery,
@@ -19,7 +18,9 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'shared/auth/permission.decorator';
 import { AuthGuard } from 'shared/auth/auth.guard';
 import { GetInventoryItemsQuery } from 'reservation/application/queries/get-inventory-items.query';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { UpsertLocationCommand } from 'reservation/application/commands/upsert-location.command';
+import { UpsertInventoryItemCommand } from 'reservation/application/commands/upsert-inventory-items.command';
 
 // TODO: Add DTOs for the request and response payloads
 @Controller('inventory-items')
@@ -27,7 +28,7 @@ import { QueryBus } from '@nestjs/cqrs';
 @ApiBearerAuth('access-token')
 export class InventoryController {
   constructor(
-    private inventoryService: InventoryService,
+    private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
 
@@ -35,32 +36,31 @@ export class InventoryController {
   @UseGuards(WebhookSignatureGuard)
   async create(@Body() body: any) {
     if (body['_type'] === 'location') {
-      const dto = {
-        cmsId: body._id,
-        title: body.title,
-        address: body.address,
-      };
-      await this.inventoryService.upsertLocation(dto);
+      await this.commandBus.execute(
+        new UpsertLocationCommand(body._id, body.title, body.address),
+      );
     }
     if (body['_type'] === 'room') {
-      const dto = {
-        cmsId: body._id,
-        type: 'room',
-        title: body.title,
-        data: { capacity: body.capacity },
-        locationCmsId: body.location._ref,
-      };
-      await this.inventoryService.upsertInventoryItem(dto);
+      await this.commandBus.execute(
+        new UpsertInventoryItemCommand(
+          body._id,
+          'room',
+          body.title,
+          { capacity: body.capacity },
+          body.location._ref,
+        ),
+      );
     }
     if (body['_type'] === 'desk') {
-      const dto = {
-        cmsId: body._id,
-        type: 'desk',
-        title: body.title,
-        data: { equipment: body.equipment },
-        locationCmsId: body.location._ref,
-      };
-      await this.inventoryService.upsertInventoryItem(dto);
+      await this.commandBus.execute(
+        new UpsertInventoryItemCommand(
+          body._id,
+          'desk',
+          body.title,
+          { equipment: body.equipment },
+          body.location._ref,
+        ),
+      );
     }
   }
 
