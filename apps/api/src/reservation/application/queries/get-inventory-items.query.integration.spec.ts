@@ -5,19 +5,23 @@ import { EntityManager } from '@mikro-orm/postgresql';
 import { DatabaseModule } from 'shared/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import databaseConfig from 'config/database.config';
-import { InventoryService } from './inventory.service';
-import { InventoryItem } from '../core/entities/inventory-item.entity';
-import { Location } from '../core/entities/location.entity';
+import {
+  GetInventoryItemsHandler,
+  GetInventoryItemsQuery,
+} from './get-inventory-items.query';
+import { getLoggerToken } from 'nestjs-pino';
 import { createInventoryItem } from 'shared/database/factories/inventory-item.factory';
 import { createLocation } from 'shared/database/factories/location.factory';
-import { createReservation } from 'shared/database/factories/reservation.factory';
 import { createUser } from 'shared/database/factories/user.factory';
+import { createReservation } from 'shared/database/factories/reservation.factory';
 import { addMinutes } from 'date-fns';
+import { InventoryItem } from 'reservation/core/entities/inventory-item.entity';
+import { Location } from 'reservation/core/entities/location.entity';
 
-describe('InventoryService', () => {
+describe('GetInventoryItemsQuery', () => {
   let module: TestingModule;
   let em: EntityManager;
-  let service: InventoryService;
+  let service: GetInventoryItemsHandler;
 
   beforeEach(async () => {
     module = await Test.createTestingModule({
@@ -32,10 +36,20 @@ describe('InventoryService', () => {
         MikroOrmModule.forFeature([InventoryItem, Location]),
       ],
       controllers: [],
-      providers: [InventoryService],
+      providers: [
+        {
+          provide: getLoggerToken(GetInventoryItemsHandler.name),
+          useClass: class {
+            info() {
+              return jest.fn();
+            }
+          },
+        },
+        GetInventoryItemsHandler,
+      ],
     }).compile();
     em = module.get(EntityManager);
-    service = module.get(InventoryService);
+    service = module.get(GetInventoryItemsHandler);
     const orm = module.get(MikroORM);
     const generator = orm.getSchemaGenerator();
     await generator.clearDatabase();
@@ -63,7 +77,8 @@ describe('InventoryService', () => {
       locationId,
     });
 
-    const result = await service.getAll({});
+    const query = new GetInventoryItemsQuery(null, null, null);
+    const result = await service.execute(query);
 
     expect(result).toMatchObject({
       count: 1,
@@ -127,10 +142,12 @@ describe('InventoryService', () => {
       endDate: addMinutes(now, 29),
     });
 
-    const result = await service.getAll({
-      startDate: addMinutes(now, 20),
-      endDate: addMinutes(now, 30),
-    });
+    const query = new GetInventoryItemsQuery(
+      null,
+      addMinutes(now, 20),
+      addMinutes(now, 30),
+    );
+    const result = await service.execute(query);
 
     expect(result).toMatchObject({
       count: 1,
