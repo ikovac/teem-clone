@@ -1,4 +1,5 @@
 import { InjectRepository } from '@mikro-orm/nestjs';
+import { MikroORM } from '@mikro-orm/core';
 import {
   CreateRequestContext,
   EntityManager,
@@ -24,6 +25,7 @@ export class UpsertLocationHandler
     @InjectRepository(Location)
     private repository: EntityRepository<Location>,
     private em: EntityManager,
+    private orm: MikroORM,
     @InjectPinoLogger(UpsertLocationHandler.name)
     private readonly logger: PinoLogger,
   ) {}
