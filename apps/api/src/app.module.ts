@@ -14,7 +14,6 @@ import { HealthController } from 'health.controller';
 import { AuthModule } from './auth/auth.module';
 import { ReservationModule } from './reservation/reservation.module';
 import { NotificationModule } from './notification/notification.module';
-import { InventoryModule } from './inventory/inventory.module';
 import mailConfig from 'config/mail.config';
 import cmsConfig from 'config/cms.config';
 
@@ -40,7 +39,6 @@ import cmsConfig from 'config/cms.config';
     AuthModule,
     ReservationModule,
     NotificationModule,
-    InventoryModule,
   ],
   controllers: [HealthController],
 })
